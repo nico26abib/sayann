@@ -53,7 +53,10 @@ python bot.py
 ```
 
 **Vocal:**
-Envoie un message vocal → Il transcrit automatiquement → Répond
+```
+🎤 Envoie un message vocal → Il transcrit → Répond
+@bot Prix Bitcoin en vocal → Il répond en audio 🔊
+```
 
 Le bot répond en 15-25 secondes avec l'info + source.
 

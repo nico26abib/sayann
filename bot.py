@@ -52,16 +52,42 @@ async def on_message(message):
         async with message.channel.typing():
             try:
                 logger.info(f"Query from {message.author}: {query[:100]}...")
+                
+                # Check if user wants voice response
+                voice_keywords = ["en vocal", "en voix", "réponds en vocal", "dis-moi en voix", "réponds vocalement", "avec ta voix"]
+                wants_voice = any(keyword in query.lower() for keyword in voice_keywords)
+                
+                # Remove voice keywords from query
+                if wants_voice:
+                    for keyword in voice_keywords:
+                        query = query.lower().replace(keyword, "").strip()
+                
                 result = await agent.process_query(query)
                 logger.info(f"Response: {result[:100]}...")
                 
-                # Split long messages
-                if len(result) > config.MAX_RESPONSE_LENGTH:
-                    chunks = [result[i:i+config.MAX_RESPONSE_LENGTH] for i in range(0, len(result), config.MAX_RESPONSE_LENGTH)]
-                    for chunk in chunks:
-                        await message.reply(chunk)
+                # Send voice response if requested
+                if wants_voice:
+                    try:
+                        logger.info("Generating voice response...")
+                        audio_path = await voice_tool.text_to_speech(result, voice=config.TTS_VOICE)
+                        await message.reply(
+                            content="🔊 Réponse vocale:",
+                            file=discord.File(audio_path, filename="response.mp3")
+                        )
+                        # Clean up temp file
+                        import os
+                        os.unlink(audio_path)
+                    except Exception as e:
+                        logger.error(f"Voice generation error: {e}")
+                        await message.reply(f"Réponse (erreur audio): {result}")
                 else:
-                    await message.reply(result)
+                    # Split long messages
+                    if len(result) > config.MAX_RESPONSE_LENGTH:
+                        chunks = [result[i:i+config.MAX_RESPONSE_LENGTH] for i in range(0, len(result), config.MAX_RESPONSE_LENGTH)]
+                        for chunk in chunks:
+                            await message.reply(chunk)
+                    else:
+                        await message.reply(result)
                     
             except Exception as e:
                 logger.error(f"Error: {e}", exc_info=True)
@@ -75,6 +101,24 @@ async def search_command(ctx, *, query: str):
             result = await agent.process_query(query)
             await ctx.reply(result)
         except Exception as e:
+            await ctx.reply(f"Erreur: {str(e)}")
+
+@bot.command(name="voice")
+async def voice_command(ctx, *, query: str):
+    """Recherche une info et répond en vocal"""
+    async with ctx.typing():
+        try:
+            result = await agent.process_query(query)
+            logger.info("Generating voice response...")
+            audio_path = await voice_tool.text_to_speech(result, voice=config.TTS_VOICE)
+            await ctx.reply(
+                content="🔊 Réponse vocale:",
+                file=discord.File(audio_path, filename="response.mp3")
+            )
+            import os
+            os.unlink(audio_path)
+        except Exception as e:
+            logger.error(f"Voice error: {e}")
             await ctx.reply(f"Erreur: {str(e)}")
 
 @bot.event

@@ -37,4 +37,32 @@ class VoiceTool:
             return transcript.text
         finally:
             os.unlink(temp_path)
+    
+    async def text_to_speech(self, text: str, voice: str = "alloy") -> str:
+        """Convert text to speech using OpenAI TTS
+        
+        Args:
+            text: Text to convert to speech
+            voice: Voice to use (alloy, echo, fable, onyx, nova, shimmer)
+            
+        Returns:
+            Path to temporary audio file
+        """
+        # Create temp file path
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
+        temp_path = temp_file.name
+        temp_file.close()
+        
+        # Generate speech and save to file
+        response = await self.client.audio.speech.create(
+            model=config.TTS_MODEL,
+            voice=voice,
+            input=text,
+            speed=config.TTS_SPEED
+        )
+        
+        # Write response to file
+        await response.awrite_to_file(temp_path)
+        
+        return temp_path
 

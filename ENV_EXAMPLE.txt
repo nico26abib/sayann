@@ -18,6 +18,9 @@ TYPING_INDICATOR=true
 # Voice Configuration
 WHISPER_MODEL=whisper-1
 WHISPER_LANGUAGE=fr
+TTS_MODEL=tts-1
+TTS_VOICE=alloy
+TTS_SPEED=1.0
 
 # Rate Limiting (optional)
 RATE_LIMIT_REQUESTS=10
