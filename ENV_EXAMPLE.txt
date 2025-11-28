@@ -1,0 +1,25 @@
+# Discord Bot Configuration
+DISCORD_TOKEN=your_discord_bot_token_here
+COMMAND_PREFIX=!
+
+# OpenAI Configuration
+OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_MODEL=gpt-4o
+OPENAI_TEMPERATURE=0
+
+# Browser Configuration
+BROWSER_TIMEOUT=15000
+BROWSER_HEADLESS=true
+
+# Response Configuration
+MAX_RESPONSE_LENGTH=2000
+TYPING_INDICATOR=true
+
+# Voice Configuration
+WHISPER_MODEL=whisper-1
+WHISPER_LANGUAGE=fr
+
+# Rate Limiting (optional)
+RATE_LIMIT_REQUESTS=10
+RATE_LIMIT_WINDOW=60
+
